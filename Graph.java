@@ -27,7 +27,7 @@ public class Graph<E> implements GraphADT<E> {
 		 */
 		public Vertex(K word) {
 			this.word = word;
-			adjacents = null;
+			adjacents = new ArrayList<Vertex<K>>();
 		}
 	}
 
@@ -112,8 +112,8 @@ public class Graph<E> implements GraphADT<E> {
 	 */
     @Override
     public boolean addEdge(E vertex1, E vertex2) {
-    	// check argument conditions
-        if ( !words.containsKey(vertex1) || !words.containsKey(vertex2) || (vertex1 == vertex2)) {
+    		// check argument conditions
+        if ( !words.containsKey(vertex1) || !words.containsKey(vertex2) || (vertex1.equals(vertex2))) {
     			return false;
         } else {
 	        	Vertex<E> v1 = words.get(vertex1);
@@ -146,7 +146,7 @@ public class Graph<E> implements GraphADT<E> {
     @Override
     public boolean removeEdge(E vertex1, E vertex2) {
     		// check argument conditions
-        if ( !words.containsKey(vertex1) || !words.containsKey(vertex2) || (vertex1 == vertex2)) {
+        if ( !words.containsKey(vertex1) || !words.containsKey(vertex2) || (vertex1.equals(vertex2))) {
     			return false;
         } else {
 	        	Vertex<E> v1 = words.get(vertex1);
@@ -179,7 +179,7 @@ public class Graph<E> implements GraphADT<E> {
     @Override
     public boolean isAdjacent(E vertex1, E vertex2) {
     		// check argument conditions
-        if ( !words.containsKey(vertex1) || !words.containsKey(vertex2) || (vertex1 == vertex2)) {
+        if ( !words.containsKey(vertex1) || !words.containsKey(vertex2) || (vertex1.equals(vertex2))) {
     			return false;
         } else {
 	        	Vertex<E> v1 = words.get(vertex1);
