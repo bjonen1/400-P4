@@ -1,11 +1,16 @@
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Stack;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 
 /**
  * This class adds additional functionality to the graph as a whole.
@@ -40,13 +45,18 @@ public class GraphProcessor {
     /**
      * Graph which stores the dictionary words and their associated connections
      */
+	private ArrayList<ArrayList<ArrayList<String>>> paths;
     private GraphADT<String> graph;
-
+    private ArrayList<Vertex<String>> vertices;
+    private int numVertices;
     /**
      * Constructor for this class. Initializes instances variables to set the starting state of the object
      */
     public GraphProcessor() {
         this.graph = new Graph<>();
+        vertices = new ArrayList<>();
+        this.paths = new ArrayList<ArrayList<ArrayList<String>>>();
+        numVertices = 0;
     }
         
     /**
@@ -64,7 +74,38 @@ public class GraphProcessor {
      * @return Integer the number of vertices (words) added
      */
     public Integer populateGraph(String filepath) {
-        return 0;
+       int count = 0;
+       try {
+    	   Stream<String> stream = WordProcessor.getWordStream(filepath);
+    	   List<String> listOfLines = stream.collect(Collectors.toList());
+    	   
+    		for(String word: listOfLines) {
+				String newString = graph.addVertex(word);
+				if(newString != null) {
+					Vertex<String> v = new Vertex<String>(word);
+					vertices.add(v);
+					count++;
+					numVertices++;
+					for(String vertices: graph.getAllVertices()) {
+						if(vertices.equals(word))
+							continue;
+						if(WordProcessor.isAdjacent(word, vertices)) {
+							graph.addEdge(word, vertices);
+						}
+					}
+					paths.add(new ArrayList<ArrayList<String>>());
+					for(ArrayList<ArrayList<String>> col: paths) {
+						col.add(new ArrayList<String>());
+					}
+					shortestPathPrecomputation();
+				}
+			}
+		} catch (IOException e) {
+			count = -1; 
+		}
+    	
+    	
+    	return count;
     
     }
 
@@ -87,9 +128,17 @@ public class GraphProcessor {
      * @return List<String> list of the words
      */
     public List<String> getShortestPath(String word1, String word2) {
-        return null;
-    
-    }
+    	  int loc1 = -1;
+          int loc2 = -2;
+          int counter = 0;
+          for(Vertex<String> v: vertices) {
+          	if(v.getVal().equals(word1))
+          		loc1 = counter;
+          	if(v.getVal().equals(word2))
+          		loc2 = counter;
+          }
+      	return paths.get(loc2).get(loc1);
+      }
     
     /**
      * Gets the distance of the shortest path between word1 and word2
@@ -109,7 +158,7 @@ public class GraphProcessor {
      * @return Integer distance
      */
     public Integer getShortestDistance(String word1, String word2) {
-        return null;
+    	 return getShortestPath(word1, word2).size() - 1;
     }
     
     /**
@@ -118,6 +167,102 @@ public class GraphProcessor {
      * Any shortest path algorithm can be used (Djikstra's or Floyd-Warshall recommended).
      */
     public void shortestPathPrecomputation() {
-    
+    	Vertex<String> newVertex = vertices.get(numVertices - 1);
+    	int i = 0;
+    	for(Vertex<String> v: vertices) {
+    		if(v.getVal().equals(newVertex.getVal()))
+    			continue;
+    		ArrayList<String> shortestPath = dijkstra(v, newVertex);
+    		paths.get(numVertices - 1).add(i, shortestPath);
+    		paths.get(i).add(numVertices - 1, shortestPath);
+    		i++;
+    	}
     }
+    
+    private ArrayList<String> dijkstra(Vertex<String> start, Vertex<String> end) {
+    	start.setWeight(0);
+    	PriorityQueue<Vertex<String>> pq = new PriorityQueue<Vertex<String>>(new VertexComparator());
+    	pq.add(start);
+    	while(!pq.isEmpty()) {
+    		Vertex<String> min = pq.poll();
+    		min.setVisited(true);
+    		for(String str: graph.getNeighbors(min.getVal())) {
+    			Vertex<String> neighbor = null;
+    			for(Vertex<String> v: vertices) {
+    				if(v.getVal().equals(str)) {
+    					neighbor = v;
+    				}
+    			}
+    			if(!neighbor.isVisited()) {
+    				if(neighbor.getWeight() > min.getWeight() + 1) {
+    					neighbor.setWeight(min.getWeight() + 1);
+    					neighbor.setPred(min);
+    					pq.add(neighbor);
+    				}
+    			}
+    		}
+    	}
+    	LinkedList<String> p = new LinkedList<String>();
+    	Vertex<String> current = end;
+    	while(current != null) {
+    		p.addFirst(current.getVal());
+    		current.setDefault();
+    		current = current.getPred();
+    		}
+    	String[] arr = (String[]) p.toArray();
+    	return new ArrayList<String>(Arrays.asList(arr));
+    }
+}
+    class Vertex<T>{
+    	public Vertex(T val) {
+    		visited = false;
+    		weight = Integer.MAX_VALUE;
+    		pred = null;
+    		this.val = val;
+    	}
+    	
+    	public T getVal() {
+			return val;
+		}
+    	public boolean isVisited() {
+			return visited;
+		}
+		public void setVisited(boolean visited) {
+			this.visited = visited;
+		}
+		public int getWeight() {
+			return weight;
+		}
+		public void setWeight(int weight) {
+			this.weight = weight;
+		}
+		public Vertex<String> getPred() {
+			return pred;
+		}
+		public void setPred(Vertex<String> pred) {
+			this.pred = pred;
+		}
+		public void setDefault() {
+			visited = false;
+    		weight = Integer.MAX_VALUE;
+    		pred = null;
+		}
+		private boolean visited;
+		private int weight;
+    	private Vertex<String> pred;
+    	private T val;
+	}
+    
+    class VertexComparator implements Comparator<Vertex<String>> {
+		
+    	@Override
+		public int compare(Vertex<String> o1, Vertex<String> o2) {
+			Integer comp1 = o1.getWeight();
+			Integer comp2 = o2.getWeight();
+			if(comp1.equals(comp2)) {
+				return o1.getVal().compareTo(o2.getVal());
+			}
+			else
+				return comp1.compareTo(comp2);
+		}
 }
