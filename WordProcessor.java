@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.stream.Stream;
 
 /**
@@ -59,13 +60,16 @@ public class WordProcessor {
 		 * 		3. collect( )  [collects all the lines into a java.util.List object]
 		 * 			-  can be used in the function which will invoke this method to convert Stream<String> of lines to List<String> of lines
 		 * 			-  example below collects all the elements of the Stream into a List and returns the List:
-		 * 				List<String> listOfLines = streamOfLines.collect(Collectors::toList); 
+		 * 				List<String> listOfLines = streamOfLines.collect(Collectors.toList()); 
 		 * 
 		 * Note: since map and filter return the updated Stream objects, they can chained together as:
 		 * 		streamOfLines.map(...).filter(a -> ...).map(...) and so on
 		 */
-		
-		return null;
+		Stream <String> wordStream = Files.lines(Paths.get(filepath))
+				.map(String::trim)
+				.filter(x -> x!= null && !x.equals(""))
+				.map(String::toUpperCase);
+		return wordStream;
 	}
 	
 	/**
@@ -85,7 +89,75 @@ public class WordProcessor {
 	 * @param word2 second word
 	 * @return true if word1 and word2 are adjacent else false
 	 */
-	public static boolean isAdjacent(String word1, String word2) {
+public static boolean isAdjacent(String word1, String word2) {
+		
+		// Lengths must be same or a difference of only 1
+		if(Math.abs(word1.length() - word2.length()) > 1){
+			return false;
+		}
+		
+		ArrayList<Character> word1chars = new ArrayList<Character>();
+		for (char c : word1.toCharArray()) {
+		  word1chars.add(c);
+		}
+		
+		ArrayList<Character> word2chars = new ArrayList<Character>();
+		for (char c : word2.toCharArray()) {
+		  word2chars.add(c);
+		}
+		
+		// word 1 is 1 char longer than word 2
+		if(word1chars.size() > word2chars.size()){ 
+//			System.out.println("word 1 longer");
+			for(int i = word2chars.size() -1 ; i >= 0; i--){
+				if(word2chars.get(i) == word1chars.get(i)){
+					word1chars.remove(i);
+				}
+				else if(word2chars.get(i) == word1chars.get(i + 1)){
+					word1chars.remove(i+1);
+				}
+			}
+			
+//			System.out.println(word1chars.size());
+			if(word1chars.size() <= 1){
+				return true;
+			}
+		}
+		
+		// word 2 is 1 char longer than word 1
+		else if(word2chars.size() > word1chars.size()){ 
+//			System.out.println("word 2 longer");
+			for(int i = word1chars.size() -1 ; i >= 0; i--){
+					if(word1chars.get(i) == word2chars.get(i)){
+						word2chars.remove(i);
+					}
+					else if(word1chars.get(i) == word2chars.get(i + 1)){
+						word2chars.remove(i+1);
+					}
+				}
+			
+//			System.out.println(word2chars.size());
+			if(word2chars.size() <= 1){
+				return true;
+			}
+			
+			}
+		
+		// words have same length
+		else{ 
+//			System.out.println("words equal length");
+			for(int i = word1chars.size() - 1; i >= 0; i--){
+				if(word1chars.get(i) == word2chars.get(i)){ // || word1chars.get(i) == word2chars.get(i - 1)){
+					word2chars.remove(i);
+				}
+			}
+			
+//			System.out.println(word2chars.size());
+			if(word2chars.size() <= 1){
+				return true;
+			}
+		}
+		
 		return false;	
 	}
 	
