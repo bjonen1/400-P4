@@ -108,7 +108,6 @@ public static boolean isAdjacent(String word1, String word2) {
 		
 		// word 1 is 1 char longer than word 2
 		if(word1chars.size() > word2chars.size()){ 
-//			System.out.println("word 1 longer");
 			for(int i = word2chars.size() -1 ; i >= 0; i--){
 				if(word2chars.get(i) == word1chars.get(i)){
 					word1chars.remove(i);
@@ -118,7 +117,7 @@ public static boolean isAdjacent(String word1, String word2) {
 				}
 			}
 			
-//			System.out.println(word1chars.size());
+			// if the amount of unmatched characters (word1chars.size() now) is 0 or 1, they are adjacent
 			if(word1chars.size() <= 1){
 				return true;
 			}
@@ -126,7 +125,6 @@ public static boolean isAdjacent(String word1, String word2) {
 		
 		// word 2 is 1 char longer than word 1
 		else if(word2chars.size() > word1chars.size()){ 
-//			System.out.println("word 2 longer");
 			for(int i = word1chars.size() -1 ; i >= 0; i--){
 					if(word1chars.get(i) == word2chars.get(i)){
 						word2chars.remove(i);
@@ -136,7 +134,7 @@ public static boolean isAdjacent(String word1, String word2) {
 					}
 				}
 			
-//			System.out.println(word2chars.size());
+			// if the amount of unmatched characters (word2chars.size() now) is 0 or 1, they are adjacent
 			if(word2chars.size() <= 1){
 				return true;
 			}
@@ -145,14 +143,13 @@ public static boolean isAdjacent(String word1, String word2) {
 		
 		// words have same length
 		else{ 
-//			System.out.println("words equal length");
 			for(int i = word1chars.size() - 1; i >= 0; i--){
 				if(word1chars.get(i) == word2chars.get(i)){ // || word1chars.get(i) == word2chars.get(i - 1)){
-					word2chars.remove(i);
+					word2chars.remove(i); // remove the character they had in common
 				}
 			}
 			
-//			System.out.println(word2chars.size());
+			// if the amount of unmatched characters (word2chars.size() now) is 0 or 1, they are adjacent
 			if(word2chars.size() <= 1){
 				return true;
 			}
