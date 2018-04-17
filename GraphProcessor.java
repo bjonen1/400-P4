@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
+
 /**
  * This class adds additional functionality to the graph as a whole.
  * 
@@ -128,16 +129,29 @@ public class GraphProcessor {
      * @return List<String> list of the words
      */
     public List<String> getShortestPath(String word1, String word2) {
-    	  int loc1 = -1;
-          int loc2 = -2;
-          int counter = 0;
-          for(Vertex<String> v: vertices) {
-          	if(v.getVal().equals(word1))
-          		loc1 = counter;
-          	if(v.getVal().equals(word2))
-          		loc2 = counter;
-          }
-      	return paths.get(loc2).get(loc1);
+    	// if graph has < 2 words
+    	if(vertices.size() < 2 || word1 == null || word2 == null) 
+    		return new ArrayList<String>();
+    	word1 = word1.toUpperCase().trim();
+        word2 = word2.toUpperCase().trim();
+    	if(word1.equals(word2)
+    			|| word1.equals("") || word2.equals("") ) // if the two words are the same
+    		return null;
+        int location1 = -1; // stores location of word1 and 2 in the array vertices
+        int location2 = -1; 
+        int counter = 0; // tracks location of words 
+        for(Vertex<String> v: vertices) {
+        	if(v.getVal().equals(word1))
+        		location1 = counter;
+        	if(v.getVal().equals(word2))
+        		location2 = counter;
+        	counter++;
+        }
+        // if either word isn't in the graph
+        if(location1 == -1 || location2 == -1)
+        	return null;
+        // returns the shortest path from word1 to word2
+        return paths.get(location2).get(location1);
       }
     
     /**
@@ -167,34 +181,57 @@ public class GraphProcessor {
      * Any shortest path algorithm can be used (Djikstra's or Floyd-Warshall recommended).
      */
     public void shortestPathPrecomputation() {
-    	Vertex<String> newVertex = vertices.get(numVertices - 1);
-    	int i = 0;
-    	for(Vertex<String> v: vertices) {
-    		if(v.getVal().equals(newVertex.getVal()))
-    			continue;
-    		ArrayList<String> shortestPath = dijkstra(v, newVertex);
-    		paths.get(numVertices - 1).add(i, shortestPath);
-    		paths.get(i).add(numVertices - 1, shortestPath);
+    	// add new cell to column to create a new row
+    	for(int i = 0; i < vertices.size(); i++) {
+			ArrayList<String> aa = new ArrayList<String>();
+			for(int j = 0; j < vertices.size(); j++)
+			paths.get(i).add(j, aa);
+    	}
+    	// i iterates through list, counter finds elements to compute a path for
+    	 
+    	int counter;
+		int i = counter = 0;
+		
+		
+		//finds shortest path, builds shortest path from i to j
+    	for(ArrayList<ArrayList<String>> v: paths) {
+    		dijkstra(vertices.get(i));
+    		for(int j = counter; j < v.size(); j++) {
+    			ArrayList<String> finalPath = buildPath(vertices.get(i), vertices.get(j));
+    				v.set(j, finalPath);
+    				paths.get(j).set(i, finalPath);
+    		}
     		i++;
+    		counter++;
+    		// resets vertex values
+    		for(Vertex<String> ver: vertices)
+        		ver.setDefault(); 
     	}
     }
     
-    private ArrayList<String> dijkstra(Vertex<String> start, Vertex<String> end) {
-    	start.setWeight(0);
+    private void dijkstra(Vertex<String> start) {
+    	start.setWeight(0); // sets start weight at 0
     	PriorityQueue<Vertex<String>> pq = new PriorityQueue<Vertex<String>>(new VertexComparator());
-    	pq.add(start);
-    	while(!pq.isEmpty()) {
-    		Vertex<String> min = pq.poll();
-    		min.setVisited(true);
-    		for(String str: graph.getNeighbors(min.getVal())) {
+    	pq.add(start); // adds first vertex to PQ
+    	while(!pq.isEmpty()) { // runs through whole pq 
+    		Vertex<String> min = pq.poll(); // removes highest element in pq
+    		min.setVisited(true); // marks element as visited
+    		for(String str: graph.getNeighbors(min.getVal())) { 
     			Vertex<String> neighbor = null;
+    			
+    			//finds the vertices to each neighbor
     			for(Vertex<String> v: vertices) {
     				if(v.getVal().equals(str)) {
     					neighbor = v;
+    					break;
     				}
     			}
+    			// iterates through each unvisited neighbor
     			if(!neighbor.isVisited()) {
+    				// checks if the weight can be reduced
     				if(neighbor.getWeight() > min.getWeight() + 1) {
+    					
+    					//updates vaules for neighbor and puts in priority queue
     					neighbor.setWeight(min.getWeight() + 1);
     					neighbor.setPred(min);
     					pq.add(neighbor);
@@ -202,17 +239,27 @@ public class GraphProcessor {
     			}
     		}
     	}
-    	LinkedList<String> p = new LinkedList<String>();
-    	Vertex<String> current = end;
-    	while(current != null) {
-    		p.addFirst(current.getVal());
-    		current.setDefault();
-    		current = current.getPred();
-    		}
-    	String[] arr = (String[]) p.toArray();
-    	return new ArrayList<String>(Arrays.asList(arr));
     }
+private ArrayList<String> buildPath(Vertex<String> start, Vertex<String> end) {
+	Stack<String> stack = new Stack<String>();
+	Vertex<String> current = end;
+	ArrayList<String> array = new ArrayList<String>();
+	// adds vertices to start of list
+	while(current != start && current != null) {
+		stack.add(current.getVal());
+		current = current.getPred();
+		}
+	stack.add(start.getVal());
+	// if path does not exist or start = end
+	if(stack.size() == 1 || current == null || current != start)
+		return new ArrayList<String>();
+	while(!stack.isEmpty()) {
+		array.add(stack.pop());
+	}
+	return array;
 }
+
+
     class Vertex<T>{
     	public Vertex(T val) {
     		visited = false;
@@ -265,4 +312,5 @@ public class GraphProcessor {
 			else
 				return comp1.compareTo(comp2);
 		}
+}
 }
