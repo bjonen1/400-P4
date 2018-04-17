@@ -98,9 +98,10 @@ public class GraphProcessor {
 					for(ArrayList<ArrayList<String>> col: paths) {
 						col.add(new ArrayList<String>());
 					}
-					shortestPathPrecomputation();
+					
 				}
 			}
+	      	 shortestPathPrecomputation();
 		} catch (IOException e) {
 			count = -1; 
 		}
@@ -196,7 +197,7 @@ public class GraphProcessor {
 		//finds shortest path, builds shortest path from i to j
     	for(ArrayList<ArrayList<String>> v: paths) {
     		dijkstra(vertices.get(i));
-    		for(int j = counter; j < v.size(); j++) {
+    		for(int j = counter; j < paths.size(); j++) {
     			ArrayList<String> finalPath = buildPath(vertices.get(i), vertices.get(j));
     				v.set(j, finalPath);
     				paths.get(j).set(i, finalPath);
