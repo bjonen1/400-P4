@@ -176,18 +176,17 @@ public class GraphProcessorTest {
 		List<String> actualwordlist = graphproc1.getShortestPath("chat","scarce");
 				
 		List<String> expectedwordList = new ArrayList<String>();
-		expectedwordList.add("chat");
-		expectedwordList.add("hat");
-		expectedwordList.add("hate");
-		expectedwordList.add("hates");
-		expectedwordList.add("dates");
-		expectedwordList.add("dated");
-		expectedwordList.add("dared");
-		expectedwordList.add("cared");
-		expectedwordList.add("scared");
-		expectedwordList.add("scare");
-		expectedwordList.add("scarce");
-
+		expectedwordList.add("CHAT");
+		expectedwordList.add("HAT");
+		expectedwordList.add("HATE");
+		expectedwordList.add("HATES");
+		expectedwordList.add("DATES");
+		expectedwordList.add("DATED");
+		expectedwordList.add("DARED");
+		expectedwordList.add("CARED");
+		expectedwordList.add("SCARED");
+		expectedwordList.add("SCARE");
+		expectedwordList.add("SCARCE");
 		boolean match = true;
 		if (expectedwordList.size() == actualwordlist.size()) {
 			for (int i =0; i < expectedwordList.size();i++) {
