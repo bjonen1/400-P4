@@ -414,6 +414,7 @@ public class GraphProcessorTest {
 		List<String> expectedwordList = new ArrayList<String>();
 		expectedwordList.add("chat");
 		expectedwordList.add("hat");
+		expectedwordList.add("mat");
 		expectedwordList.add("hate");
 		expectedwordList.add("hates");
 		expectedwordList.add("dates");
@@ -421,12 +422,16 @@ public class GraphProcessorTest {
 		expectedwordList.add("dared");
 		expectedwordList.add("cared");
 		expectedwordList.add("scared");
+		expectedwordList.add("scaredy");
 		expectedwordList.add("scare");
 		expectedwordList.add("scarce");
 		expectedwordList.add("blind");
 
 		for (int i = 0; i < expectedwordList.size();i++) {
-			if (!expectedwordList.get(i).equals(actualStreamList.get(i))) {
+			System.out.println(actualStreamList.get(i));
+			System.out.println(expectedwordList.get(i).toUpperCase());
+			System.out.println();
+			if (!expectedwordList.get(i).toUpperCase().equals(actualStreamList.get(i))) {
 				match = false;
 			}
 		}
@@ -442,16 +447,16 @@ public class GraphProcessorTest {
 	 * tests getstreeam throws io exception on a bad filename
 	 */
 	@Test
-	public final void getstreamShouldThrowIOOnBadFile(){
+	public final void getstreamShouldThrowNoSuchFileOnBadFile() throws IOException{
 		Stream<String> actualStream;
 		try {
 			actualStream = WordProcessor.getWordStream("noneexistingfile.fake");
 			//an exception should be thrown and enter catch block
 			System.out.println("Failed: expected: "+"exception thrown"+ " actual: "+"no exception thrown");
 			fail("expected: "+"exception thrown"+ " actual: "+"no exception thrown");	
-		} catch (IOException e) {
+		} catch (NoSuchFileException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();//stack trace is printed but this is expected behavior
+			//e.printStackTrace();//stack trace is printed but this is expected behavior
 		}
 	}
 
