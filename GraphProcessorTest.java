@@ -428,9 +428,6 @@ public class GraphProcessorTest {
 		expectedwordList.add("blind");
 
 		for (int i = 0; i < expectedwordList.size();i++) {
-			System.out.println(actualStreamList.get(i));
-			System.out.println(expectedwordList.get(i).toUpperCase());
-			System.out.println();
 			if (!expectedwordList.get(i).toUpperCase().equals(actualStreamList.get(i))) {
 				match = false;
 			}
